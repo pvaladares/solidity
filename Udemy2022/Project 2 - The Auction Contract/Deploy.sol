@@ -6,8 +6,8 @@ contract A{
 
 	address public ownerA;
 
-	constructor(){
-		ownerA = msg.sender;
+	constructor(address eoa){ // external owned account
+		ownerA = eoa;
 	}
 }
 
@@ -20,7 +20,7 @@ contract Creator{
 	}
 
 	function deployA() public{
-		A new_A_address = new A();
+		A new_A_address = new A(msg.sender);
 		deployedA.push(new_A_address);
 	}
 }
