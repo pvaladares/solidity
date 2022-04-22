@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity ^0.8.11;
-//>=0.5.0 <0.9.0;
+
 contract CrowdFunding{
 	mapping(address => uint) public contributors;
 	address public admin;
@@ -29,6 +29,11 @@ contract CrowdFunding{
 		admin = msg.sender;
 	}
 
+    // Events
+    event ContributeEvent(address _sender, uint _value);
+    event CreateRequestsEvent(string _description, address _recipient, uint _value);
+    event MakePaymentEvent(address _recipient, uint _value);
+
 	function contribute() public payable{
 		require(block.timestamp < deadline, "Deadline has passed!");
 		require(msg.value >= minimumContribution, "Minimum contribution not met");
@@ -39,6 +44,8 @@ contract CrowdFunding{
 
 		contributors[msg.sender] += msg.value; // Update the contribution of the user
 		raisedAmount += msg.value;
+
+        emit ContributeEvent(msg.sender, msg.value);
 	}
 
 	function receive() payable external{
@@ -72,6 +79,8 @@ contract CrowdFunding{
 		newRequest.value = _value;
 		newRequest.completed = false;
 		newRequest.noOfVoters = 0;
+
+        emit CreateRequestsEvent(_description, _recipient, _value);
 	}
 
     function voteRequest(uint _requestNo) public{
@@ -91,6 +100,8 @@ contract CrowdFunding{
 
         thisRequest.recipient.transfer(thisRequest.value);
         thisRequest.completed = true;
+
+        emit MakePaymentEvent(thisRequest.recipient, thisRequest.value);
     }
 
 	modifier onlyAdmin(){
