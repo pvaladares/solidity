@@ -2,6 +2,13 @@
 
 pragma solidity ^0.8.11;
 
+contract AuctionCreator{
+	Auction[] public auctions;
+	function createAuction() public{
+		Auction newAction = new Auction(msg.sender);
+		auctions.push(newAction);
+	}
+}
 contract Auction{
 
 	// State variables 
@@ -21,8 +28,8 @@ contract Auction{
 	uint bidIncrement;
 
 	// Constructor
-	constructor(){
-		owner = payable(msg.sender);
+	constructor(address eoa){
+		owner = payable(eoa);
 		auctionState = State.Running;
 		startBlock = block.number;
 		endBlock = startBlock + 1 weeks; // Auction will run for one week
