@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity ^0.8.11;
-
+//>=0.5.0 <0.9.0;
 contract CrowdFunding{
 	mapping(address => uint) public contributors;
 	address public admin;
@@ -10,6 +10,17 @@ contract CrowdFunding{
 	uint public deadline; // timestamp
 	uint public goal;
 	uint public raisedAmount;
+	struct Request{
+		string description;
+		address payable recipient;
+		uint value;
+		bool completed; // by default is false
+		uint noOfVoters;
+		mapping(address => bool) voters;
+	}
+	mapping(uint => Request) public requests;
+
+	uint public numRequests;
 
 	constructor(uint _goal, uint _deadline){
 		goal = _goal;
@@ -49,5 +60,22 @@ contract CrowdFunding{
 
 		// Reset the contribution of this user
 		contributors[msg.sender] = 0;
+	}
+
+    // Initiates a new instance based on the argument passed
+	function createRequest(string memory _description, address payable _recipient, uint _value) public onlyAdmin{
+		Request storage newRequest = requests[numRequests];
+		numRequests++; // increment variable to make it ready for the next request
+
+		newRequest.description = _description;
+		newRequest.recipient = _recipient;
+		newRequest.value = _value;
+		newRequest.completed = false;
+		newRequest.noOfVoters = 0;
+	}
+
+	modifier onlyAdmin(){
+		require(msg.sender == admin, "Only admin can call this function!");
+		_;
 	}
 }
