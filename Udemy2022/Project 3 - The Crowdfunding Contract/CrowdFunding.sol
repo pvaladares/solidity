@@ -74,6 +74,15 @@ contract CrowdFunding{
 		newRequest.noOfVoters = 0;
 	}
 
+    function voteRequest(uint _requestNo) public{
+        require(contributors[msg.sender] > 0, "You must a contributor in order to vote!");
+        Request storage thisRequest = requests[_requestNo];
+
+        require(thisRequest.voters[msg.sender] == false, "You have already voted!");
+        thisRequest.voters[msg.sender] = true;
+        thisRequest.noOfVoters++;
+    }
+
 	modifier onlyAdmin(){
 		require(msg.sender == admin, "Only admin can call this function!");
 		_;
