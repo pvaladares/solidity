@@ -37,4 +37,17 @@ contract CrowdFunding{
 	function getBalance() public view returns(uint){
 		return address(this).balance;
 	}
+
+	function getRefund() public{
+		require(block.timestamp > deadline && raisedAmount < goal, "NO REFUND : Campaign is not finished yet | Goal was met");
+		require(contributors[msg.sender] > 0, "NO REFUND : You are not a contributor");
+	
+		// Make the refund
+		address payable recipient = payable(msg.sender);
+		uint value = contributors[msg.sender];
+		recipient.transfer(value);
+
+		// Reset the contribution of this user
+		contributors[msg.sender] = 0;
+	}
 }
