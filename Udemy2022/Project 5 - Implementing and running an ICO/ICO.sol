@@ -101,7 +101,7 @@ contract CryptoICO is Cryptos{
     }
 
 	modifier onlyAdmin(){
-		require(msg.sender == admin, "Caller must be  admin!");
+		require(msg.sender == admin, "Caller must be admin!");
 		_;
 	}
 
@@ -127,5 +127,29 @@ contract CryptoICO is Cryptos{
 		}else{
 			return State.afterEnd;
 		}
+	}
+
+	event Invest(address investor, uint value, uint tokens);
+
+	// Main function of the ICO
+	function invest() payable public returns(bool){
+		icoState = getCurrentState();
+		require(icoState == State.running, "ICO is not running!");
+		require(msg.value >= minInvestment && msg.value <= maxInvestment, "Value is outside allowable limits!");
+		require(msg.value + raisedAmount <= hardCap, "Value sent overflows hard cap!");
+		raisedAmount += msg.value;
+		
+		uint tokens = msg.value / tokenPrice;
+		balances[msg.sender] += tokens;
+		balances[founder] -= tokens;
+		deposit.transfer(msg.value);
+		emit Invest(msg.sender, msg.value, tokens);
+
+		return true;
+	} 
+
+	// Function automatically called whenever contract is directly called
+	receive() payable external{
+		invest();
 	}
 }
