@@ -164,4 +164,11 @@ contract CryptoICO is Cryptos{
 		Cryptos.transferFrom(from, to, tokens);
 		return true;
 	}
+
+	function burn() public returns(bool){
+		icoState = getCurrentState();
+		require(icoState == State.afterEnd, "ICO has not ended!");
+		balances[founder] = 0;
+		return true;
+	}
 }
